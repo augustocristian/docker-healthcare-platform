@@ -47,6 +47,210 @@ https://github.com/maalwis/Healthcare-Platform---Microservice-Architecture-CICD
 
 ---
 
+## Testing with Postman
+
+### Prerequisites
+
+1. Install [Postman](https://www.postman.com/downloads/)
+2. Start the platform: `docker compose up --build`
+3. Wait until all services appear at **http://localhost:8761** (Eureka dashboard)
+
+---
+
+### Base URL
+
+All requests go through the **API Gateway**:
+
+```
+http://localhost:9090
+```
+
+---
+
+### Step 1 — Obtain a JWT Token (Login)
+
+All endpoints (except login) require a Bearer token.
+
+| Field | Value |
+|---|---|
+| Method | `POST` |
+| URL | `http://localhost:9090/api/v1/auth/login` |
+| Content-Type | `application/json` |
+
+**Body (raw JSON):**
+```json
+{
+  "username": "dev-user",
+  "password": "pass"
+}
+```
+
+**Other available test accounts** (all use password `pass`):
+
+| Username | Role |
+|---|---|
+| `dev-user` | Developer (full access) |
+| `ceo_user` | Chief Executive Officer |
+| `head_cardiology` | Department Head — Cardiology |
+| `physician_general` | Physician |
+| `surgeon_general` | Surgeon |
+| `nurse_registered` | Registered Nurse |
+| `pharmacist` | Pharmacist |
+| `it_staff` | IT Staff |
+| `lab_technician` | Laboratory Technician |
+| `receptionist` | Receptionist |
+
+**Response:**
+```json
+{
+  "username": "dev-user",
+  "jwtToken": "eyJhbGciOiJIUzI1NiJ9...",
+  "permissions": [...]
+}
+```
+
+Copy the `jwtToken` value — you will use it in all subsequent requests.
+
+---
+
+### Step 2 — Set Up Authorization in Postman
+
+**Option A — Per-request (quick test):**
+1. Open any request tab
+2. Go to **Authorization** tab
+3. Set Type to **Bearer Token**
+4. Paste your `jwtToken`
+
+**Option B — Collection variable (recommended):**
+1. Create a new Collection named `Healthcare Platform`
+2. Open the Collection → **Variables** tab
+3. Add variable: `token` (initial value empty)
+4. In the Login request → **Tests** tab, add this script:
+```javascript
+var response = pm.response.json();
+pm.collectionVariables.set("token", response.jwtToken);
+```
+5. In all other requests → **Authorization** tab → Bearer Token → value: `{{token}}`
+
+Now running the Login request automatically stores the token for all other requests.
+
+---
+
+### Step 3 — Test the Endpoints
+
+#### Patient Service (`http://localhost:9090/api/v1/patients`)
+
+| Method | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/v1/patients` | List all patients |
+| POST | `/api/v1/patients` | Create a patient |
+| GET | `/api/v1/patients/{id}` | Get patient by UUID |
+| PUT | `/api/v1/patients/{id}` | Update patient |
+| DELETE | `/api/v1/patients/{id}` | Delete patient |
+
+**Create patient — Body (raw JSON):**
+```json
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "dateOfBirth": "1985-06-15T00:00:00",
+  "gender": "M",
+  "contactInfo": "+1-555-0101",
+  "metadata": ""
+}
+```
+
+---
+
+#### Appointment Service (`/api/v1/appointments`)
+
+| Method | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/v1/appointments` | List all appointments |
+| POST | `/api/v1/appointments` | Create appointment |
+| GET | `/api/v1/appointments/{id}` | Get appointment |
+| PUT | `/api/v1/appointments/{id}` | Update appointment |
+| DELETE | `/api/v1/appointments/{id}` | Cancel appointment |
+
+---
+
+#### Staff Service (`/api/v1/staff`)
+
+| Method | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/v1/staff` | List all staff |
+| POST | `/api/v1/staff` | Create staff record |
+| GET | `/api/v1/staff/{id}` | Get staff by ID |
+| PUT | `/api/v1/staff/{id}` | Update staff |
+| DELETE | `/api/v1/staff/{id}` | Remove staff |
+
+---
+
+#### Pharmacy Service (`/api/v1/pharmacy`)
+
+| Method | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/v1/pharmacy/medications` | List medications |
+| POST | `/api/v1/pharmacy/medications` | Add medication |
+
+---
+
+#### Inventory Service (`/api/v1/inventory`)
+
+| Method | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/v1/inventory/items` | List inventory items |
+| POST | `/api/v1/inventory/items` | Add inventory item |
+| GET | `/api/v1/inventory/items/{id}` | Get item |
+| PUT | `/api/v1/inventory/items/{id}` | Update item |
+
+---
+
+#### Billing & Claims Service (`/api/v1/billing`)
+
+| Method | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/v1/billing/claims` | List all claims |
+| POST | `/api/v1/billing/claims` | Create claim |
+| GET | `/api/v1/billing/claims/{id}` | Get claim |
+
+---
+
+#### Notification Service (`/api/v1/notifications`)
+
+| Method | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/v1/notifications` | List notifications |
+| GET | `/api/v1/notifications/{id}` | Get notification |
+
+---
+
+#### Analytics Service (`/api/v1/analytics`)
+
+| Method | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/v1/analytics/reports` | Get analytics reports |
+
+---
+
+#### Audit Logging Service (`/api/v1/audit`)
+
+| Method | URL | Description |
+|--------|-----|-------------|
+| GET | `/api/v1/audit/logs` | List audit logs |
+
+---
+
+### Monitoring & Infrastructure UIs
+
+| Tool | URL | Credentials |
+|------|-----|-------------|
+| Eureka (Service Registry) | http://localhost:8761 | — |
+| RabbitMQ Management | http://localhost:15672 | `guest` / `guest` |
+| Zipkin (Distributed Tracing) | http://localhost:9411 | — |
+
+---
+
 ## Table of Contents
 
 * [System Architecture](#system-architecture)

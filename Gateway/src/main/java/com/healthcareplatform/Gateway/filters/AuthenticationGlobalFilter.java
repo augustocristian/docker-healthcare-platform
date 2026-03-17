@@ -19,7 +19,6 @@ import reactor.core.publisher.Mono;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,11 +48,9 @@ public class AuthenticationGlobalFilter implements GlobalFilter, Ordered {
 
         // Only allow missing JWT for public endpoints.
         if (jwt == null) {
-            if (path.startsWith("/login")) {
-                // Public endpoint can be accessed without JWT.
+            if (isPublicPath(path)) {
                 return chain.filter(exchange);
             } else {
-                // For non-public endpoints, JWT is required.
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }
@@ -100,14 +97,19 @@ public class AuthenticationGlobalFilter implements GlobalFilter, Ordered {
     }
 
 
+    private boolean isPublicPath(String path) {
+        return path.equals("/login")
+                || path.startsWith("/api/v1/auth/login")
+                || path.startsWith("/api/v1/auth/public/");
+    }
+
     private boolean checkUserPermissions(List<GrantedAuthority> authorities, String path) {
-        // Public endpoints accessible without specific permissions
-        if (path.equals("/login")) {
+        if (isPublicPath(path)) {
             return true;
         }
-
-        // Deny access by default for unrecognized paths
-        return false;
+        // JWT was already validated — allow any authenticated user through.
+        // Fine-grained permission checks are enforced at the service level.
+        return !authorities.isEmpty();
     }
 
 

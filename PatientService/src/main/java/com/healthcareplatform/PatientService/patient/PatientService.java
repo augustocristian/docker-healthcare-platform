@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -86,7 +87,7 @@ public class PatientService {
      * @throws DataAccessException       if a database access error occurs
      */
     @Transactional(readOnly = true)
-    public PatientResponse getPatientById(Long id) {
+    public PatientResponse getPatientById(UUID id) {
         // attempt to find the Patient entity by ID
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + id));
@@ -135,7 +136,7 @@ public class PatientService {
      * @throws DataAccessException               if a database access error occurs
      */
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public PatientResponse updatePatient(Long id, PatientRequest patientRequest) {
+    public PatientResponse updatePatient(UUID id, PatientRequest patientRequest) {
         // fetch existing patient or throw if not found
         Patient existing = patientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + id));
@@ -181,7 +182,7 @@ public class PatientService {
      * @throws ResourceNotFoundException if patient with given patientId does not exist
      * @throws DataAccessException       if a database access error occurs
      */
-    public void deletePatient(Long patientId) {
+    public void deletePatient(UUID patientId) {
         // verify existence to provide clear error if absent
         if (!patientRepository.existsById(patientId)) {
             throw new ResourceNotFoundException("Patient not found with id: " + patientId);

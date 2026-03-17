@@ -63,14 +63,19 @@ public class RateLimitGlobalFilter implements GlobalFilter, Ordered {
         String path = request.getURI().getPath();
 
         if (jwt == null) {
-            if (path.startsWith("/login")) {
+            if (isPublicPath(path)) {
                 return Objects.requireNonNull(exchange.getRequest().getRemoteAddress()).getHostString();
-
             } else {
                 return null;
             }
         }
         return jwt;
+    }
+
+    private boolean isPublicPath(String path) {
+        return path.startsWith("/login")
+                || path.startsWith("/api/v1/auth/login")
+                || path.startsWith("/api/v1/auth/public/");
     }
 
     @Override

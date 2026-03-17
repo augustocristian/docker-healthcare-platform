@@ -41,7 +41,7 @@ public class PatientController {
      *         otherwise exception is propagated (e.g., 404 Not Found).
      */
     @GetMapping("/{id}")
-    public ResponseEntity<PatientResponse> getPatientById(@PathVariable Long Id) {
+    public ResponseEntity<PatientResponse> getPatientById(@PathVariable UUID Id) {
         // TODO: Delegate to PatientService to fetch patient by ID
         PatientResponse patient = patientService.getPatientById(Id);
         return ResponseEntity.ok(patient);
@@ -70,7 +70,7 @@ public class PatientController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<PatientResponse> updatePatient(
-            @PathVariable Long Id,
+            @PathVariable UUID Id,
             @Valid @RequestBody PatientRequest patientRequest) {
         // Delegate to PatientService to update patient details
         PatientResponse updated = patientService.updatePatient(Id, patientRequest);
@@ -84,7 +84,7 @@ public class PatientController {
      * @return ResponseEntity with HTTP 204 No Content on successful deletion.
      */
     @DeleteMapping("/{patientId}")
-    public ResponseEntity<Void> deletePatient(@PathVariable Long Id) {
+    public ResponseEntity<Void> deletePatient(@PathVariable UUID Id) {
         // Delegate to PatientService to delete patient
         patientService.deletePatient(Id);
         return ResponseEntity.noContent().build();

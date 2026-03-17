@@ -1,7 +1,5 @@
 package com.healthcareplatform.PharmacyService.exception;
 
-import com.healthcareplatform.AppointmentService.exception.EmailAlreadyExistsException;
-import com.healthcareplatform.AppointmentService.exception.UsernameAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;

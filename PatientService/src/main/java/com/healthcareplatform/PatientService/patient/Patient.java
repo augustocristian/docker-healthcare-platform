@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 
@@ -18,9 +19,9 @@ import java.time.LocalDateTime;
 @Builder
 public class Patient {
     @Id
-    @Column(name = "id",updatable = false,
-            nullable = false, columnDefinition = "UUID DEFAULT gen_random_uuid()")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @Column(name = "first_name", length = 100, nullable = false)
     private String firstName;
